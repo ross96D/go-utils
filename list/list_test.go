@@ -5,18 +5,22 @@ import (
 
 	"github.com/ross96D/go-utils/list"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestListForEach(t *testing.T) {
-	var l list.List[int]
-	l.PushFront(1)
-	l.PushFront(2)
-	l.PushFront(3)
-	l.PushFront(4)
+	var l list.List[struct{ num int }]
+	l.PushBack(struct{ num int }{num: 1})
+	l.PushBack(struct{ num int }{num: 2})
+	l.PushBack(struct{ num int }{num: 3})
+	l.PushBack(struct{ num int }{num: 4})
 
 	count := 1
+	forFuncPassed := false
 	for num := range l.Each {
-		assert.Equal(t, count, num)
+		forFuncPassed = true
+		assert.Equal(t, count, num.Value.num)
 		count++
 	}
+	require.True(t, forFuncPassed)
 }
