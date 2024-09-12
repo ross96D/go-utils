@@ -24,3 +24,23 @@ func TestListForEach(t *testing.T) {
 	}
 	require.True(t, forFuncPassed)
 }
+
+func TestRemove(t *testing.T) {
+	var l list.List[struct{ num int }]
+	e := l.PushBack(struct{ num int }{num: 1})
+	l.PushBack(struct{ num int }{num: 2})
+	l.PushBack(struct{ num int }{num: 3})
+	e2 := l.PushBack(struct{ num int }{num: 4})
+
+	l.Remove(e)
+	l.Remove(e2)
+
+	count := 2
+	forFuncPassed := false
+	for num := range l.Each {
+		forFuncPassed = true
+		assert.Equal(t, count, num.Value.num)
+		count++
+	}
+	require.True(t, forFuncPassed)
+}
