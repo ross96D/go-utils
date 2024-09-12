@@ -52,6 +52,7 @@ type List[T any] struct {
 
 // Init initializes or clears list l.
 func (l *List[T]) Init() *List[T] {
+	l.root.list = l
 	l.root.next = &l.root
 	l.root.prev = &l.root
 	l.len = 0
