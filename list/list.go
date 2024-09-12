@@ -235,9 +235,6 @@ func (l *List[T]) PushFrontList(other *List[T]) {
 }
 
 func (l *List[T]) Each(yield func(Node[T]) bool) {
-	if !yield(l.root) {
-		return
-	}
 	node := l.root.Next()
 	for {
 		if node == nil {
