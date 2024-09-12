@@ -11,8 +11,6 @@
 //	}
 package list
 
-import "iter"
-
 // Node is an element of a linked list.
 type Node[T any] struct {
 	// Next and previous pointers in the doubly-linked list of elements.
@@ -236,20 +234,18 @@ func (l *List[T]) PushFrontList(other *List[T]) {
 	}
 }
 
-func (l *List[T]) ForEach(f func()) iter.Seq[Node[T]] {
-	return func(yield func(Node[T]) bool) {
-		if !yield(l.root) {
+func (l *List[T]) Each(yield func(Node[T]) bool) {
+	if !yield(l.root) {
+		return
+	}
+	node := l.root.Next()
+	for {
+		if node == nil {
 			return
 		}
-		node := l.root.Next()
-		for {
-			if node == nil {
-				return
-			}
-			if !yield(*node) {
-				break
-			}
-			node = node.Next()
+		if !yield(*node) {
+			break
 		}
+		node = node.Next()
 	}
 }
