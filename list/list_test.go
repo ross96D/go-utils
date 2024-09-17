@@ -44,3 +44,18 @@ func TestRemove(t *testing.T) {
 	}
 	require.True(t, forFuncPassed)
 }
+
+func TestRemoveInsideEach(t *testing.T) {
+	var l list.List[struct{ num int }]
+	l.PushBack(struct{ num int }{num: 1})
+
+	require.Equal(t, 1, l.Len())
+
+	for node := range l.Each {
+		if node.Value.num == 1 {
+			l.Remove(&node)
+		}
+	}
+
+	require.Equal(t, 0, l.Len())
+}
