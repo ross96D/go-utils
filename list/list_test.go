@@ -1,6 +1,7 @@
 package list_test
 
 import (
+	"math/rand"
 	"testing"
 
 	"github.com/ross96D/go-utils/list"
@@ -58,4 +59,53 @@ func TestRemoveInsideEach(t *testing.T) {
 	}
 
 	require.Equal(t, 0, l.Len())
+}
+
+func TestSortedList(t *testing.T) {
+	t.Run("append", func(t *testing.T) {
+		t.Parallel()
+
+		l := list.SortedList[int]{}
+
+		seed := rand.Int63()
+		source := rand.NewSource(seed)
+		r := rand.New(source)
+
+		for i := 0; i < 50000; i++ {
+			v := int(r.Int())
+			l.Append(v)
+		}
+
+		before := l.Elem(0)
+		for _, v := range l.Iter(1) {
+			assert.LessOrEqual(t, before, v)
+		}
+		println("seed:", seed)
+	})
+
+	t.Run("appendAll", func(t *testing.T) {
+		t.Parallel()
+
+		l := list.SortedList[int]{}
+
+		seed := rand.Int63()
+		source := rand.NewSource(seed)
+		r := rand.New(source)
+
+		arr := [500]int{}
+
+		for i := 0; i < 100; i++ {
+			for j := 0; j < 500; j++ {
+				v := int(r.Int())
+				arr[j] = v
+			}
+			l.Append(arr[0:]...)
+		}
+
+		before := l.Elem(0)
+		for _, v := range l.Iter(1) {
+			assert.LessOrEqual(t, before, v)
+		}
+		println("seed:", seed)
+	})
 }
