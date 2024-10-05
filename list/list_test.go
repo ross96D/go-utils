@@ -86,7 +86,7 @@ func TestSortedList(t *testing.T) {
 
 		before := l.Elem(0)
 		for _, v := range l.Iter(1) {
-			assert.True(t, before.Compare(v) <= 0)
+			require.True(t, before.Compare(*v) <= 0)
 		}
 		println("seed:", seed)
 	})
@@ -107,7 +107,7 @@ func TestSortedList(t *testing.T) {
 
 		before := l.Elem(0)
 		for _, v := range l.Iter(1) {
-			assert.LessOrEqual(t, before, v)
+			require.LessOrEqual(t, before, v)
 		}
 		println("seed:", seed)
 	})

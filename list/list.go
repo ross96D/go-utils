@@ -17,11 +17,11 @@ type ISortedList[T Ordered] struct {
 	values []T
 }
 
-func (l *ISortedList[T]) Elem(idx uint) T {
-	return l.values[uint(idx)]
+func (l *ISortedList[T]) Elem(idx uint) *T {
+	return &l.values[uint(idx)]
 }
 
-func (l *ISortedList[T]) Iter(p ...uint) iter.Seq2[int, T] {
+func (l *ISortedList[T]) Iter(p ...uint) iter.Seq2[int, *T] {
 	start := uint(0)
 	end := uint(len(l.values))
 	if len(p) >= 1 {
@@ -30,9 +30,9 @@ func (l *ISortedList[T]) Iter(p ...uint) iter.Seq2[int, T] {
 	if len(p) >= 2 {
 		start = p[1]
 	}
-	return func(yield func(int, T) bool) {
+	return func(yield func(int, *T) bool) {
 		for i := start; i < end; i++ {
-			if !yield(int(i), l.values[i]) {
+			if !yield(int(i), &l.values[i]) {
 				break
 			}
 		}
