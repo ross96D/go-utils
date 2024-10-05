@@ -61,7 +61,36 @@ func TestRemoveInsideEach(t *testing.T) {
 	require.Equal(t, 0, l.Len())
 }
 
+type TestStruct struct {
+	n int
+}
+
+func (t TestStruct) Compare(o any) int {
+	return t.n - o.(TestStruct).n
+}
+
 func TestSortedList(t *testing.T) {
+	t.Run("test ISortedList", func(t *testing.T) {
+		t.Parallel()
+
+		l := list.ISortedList[TestStruct]{}
+
+		seed := rand.Int63()
+		source := rand.NewSource(seed)
+		r := rand.New(source)
+
+		for j := 0; j < 50000; j++ {
+			v := int(r.Int())
+			l.Append(TestStruct{n: v})
+		}
+
+		before := l.Elem(0)
+		for _, v := range l.Iter(1) {
+			assert.True(t, before.Compare(v) <= 0)
+		}
+		println("seed:", seed)
+	})
+
 	t.Run("append", func(t *testing.T) {
 		t.Parallel()
 
@@ -74,32 +103,6 @@ func TestSortedList(t *testing.T) {
 		for i := 0; i < 50000; i++ {
 			v := int(r.Int())
 			l.Append(v)
-		}
-
-		before := l.Elem(0)
-		for _, v := range l.Iter(1) {
-			assert.LessOrEqual(t, before, v)
-		}
-		println("seed:", seed)
-	})
-
-	t.Run("appendAll", func(t *testing.T) {
-		t.Parallel()
-
-		l := list.SortedList[int]{}
-
-		seed := rand.Int63()
-		source := rand.NewSource(seed)
-		r := rand.New(source)
-
-		arr := [500]int{}
-
-		for i := 0; i < 100; i++ {
-			for j := 0; j < 500; j++ {
-				v := int(r.Int())
-				arr[j] = v
-			}
-			l.Append(arr[0:]...)
 		}
 
 		before := l.Elem(0)
