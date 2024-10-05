@@ -9,7 +9,7 @@ import (
 )
 
 func TestListForEach(t *testing.T) {
-	var l list.List[struct{ num int }]
+	var l list.LinkedList[struct{ num int }]
 	l.PushBack(struct{ num int }{num: 1})
 	l.PushBack(struct{ num int }{num: 2})
 	l.PushBack(struct{ num int }{num: 3})
@@ -26,7 +26,7 @@ func TestListForEach(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	var l list.List[struct{ num int }]
+	var l list.LinkedList[struct{ num int }]
 	e := l.PushBack(struct{ num int }{num: 1})
 	l.PushBack(struct{ num int }{num: 2})
 	l.PushBack(struct{ num int }{num: 3})
@@ -46,7 +46,7 @@ func TestRemove(t *testing.T) {
 }
 
 func TestRemoveInsideEach(t *testing.T) {
-	var l list.List[struct{ num int }]
+	var l list.LinkedList[struct{ num int }]
 	l.PushBack(struct{ num int }{num: 1})
 
 	require.Equal(t, 1, l.Len())

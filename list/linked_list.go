@@ -21,7 +21,7 @@ type Node[T any] struct {
 	next, prev *Node[T]
 
 	// The list to which this element belongs.
-	list *List[T]
+	list *LinkedList[T]
 
 	// The value stored with this element.
 	Value T
@@ -43,15 +43,15 @@ func (e *Node[T]) Prev() *Node[T] {
 	return nil
 }
 
-// List represents a doubly linked list.
-// The zero value for List is an empty list ready to use.
-type List[T any] struct {
+// LinkedList represents a doubly linked list.
+// The zero value for LinkedList is an empty list ready to use.
+type LinkedList[T any] struct {
 	root Node[T] // sentinel list element, only &root, root.prev, and root.next are used
 	len  int     // current list length excluding (this) sentinel element
 }
 
 // Init initializes or clears list l.
-func (l *List[T]) Init() *List[T] {
+func (l *LinkedList[T]) Init() *LinkedList[T] {
 	l.root.list = l
 	l.root.next = &l.root
 	l.root.prev = &l.root
@@ -60,14 +60,14 @@ func (l *List[T]) Init() *List[T] {
 }
 
 // New returns an initialized list.
-func New[T any]() *List[T] { return new(List[T]).Init() }
+func New[T any]() *LinkedList[T] { return new(LinkedList[T]).Init() }
 
 // Len returns the number of elements of list l.
 // The complexity is O(1).
-func (l *List[T]) Len() int { return l.len }
+func (l *LinkedList[T]) Len() int { return l.len }
 
 // Front returns the first element of list l or nil if the list is empty.
-func (l *List[T]) Front() *Node[T] {
+func (l *LinkedList[T]) Front() *Node[T] {
 	if l.len == 0 {
 		return nil
 	}
@@ -75,7 +75,7 @@ func (l *List[T]) Front() *Node[T] {
 }
 
 // Back returns the last element of list l or nil if the list is empty.
-func (l *List[T]) Back() *Node[T] {
+func (l *LinkedList[T]) Back() *Node[T] {
 	if l.len == 0 {
 		return nil
 	}
@@ -83,14 +83,14 @@ func (l *List[T]) Back() *Node[T] {
 }
 
 // lazyInit lazily initializes a zero List value.
-func (l *List[T]) lazyInit() {
+func (l *LinkedList[T]) lazyInit() {
 	if l.root.next == nil {
 		l.Init()
 	}
 }
 
 // insert inserts e after at, increments l.len, and returns e.
-func (l *List[T]) insert(e, at *Node[T]) *Node[T] {
+func (l *LinkedList[T]) insert(e, at *Node[T]) *Node[T] {
 	e.prev = at
 	e.next = at.next
 	e.prev.next = e
@@ -101,12 +101,12 @@ func (l *List[T]) insert(e, at *Node[T]) *Node[T] {
 }
 
 // insertValue is a convenience wrapper for insert(&Element{Value: v}, at).
-func (l *List[T]) insertValue(v T, at *Node[T]) *Node[T] {
+func (l *LinkedList[T]) insertValue(v T, at *Node[T]) *Node[T] {
 	return l.insert(&Node[T]{Value: v}, at)
 }
 
 // remove removes e from its list, decrements l.len
-func (l *List[T]) remove(e *Node[T]) {
+func (l *LinkedList[T]) remove(e *Node[T]) {
 	e.prev.next = e.next
 	e.next.prev = e.prev
 	e.next = nil // avoid memory leaks
@@ -116,7 +116,7 @@ func (l *List[T]) remove(e *Node[T]) {
 }
 
 // move moves e to next to at.
-func (l *List[T]) move(e, at *Node[T]) {
+func (l *LinkedList[T]) move(e, at *Node[T]) {
 	if e == at {
 		return
 	}
@@ -132,7 +132,7 @@ func (l *List[T]) move(e, at *Node[T]) {
 // Remove removes e from l if e is an element of list l.
 // It returns the element value e.Value.
 // The element must not be nil.
-func (l *List[T]) Remove(e *Node[T]) T {
+func (l *LinkedList[T]) Remove(e *Node[T]) T {
 	if e.list == l {
 		// if e.list == l, l must have been initialized when e was inserted
 		// in l or l == nil (e is a zero Element) and l.remove will crash
@@ -142,13 +142,13 @@ func (l *List[T]) Remove(e *Node[T]) T {
 }
 
 // PushFront inserts a new element e with value v at the front of list l and returns e.
-func (l *List[T]) PushFront(v T) *Node[T] {
+func (l *LinkedList[T]) PushFront(v T) *Node[T] {
 	l.lazyInit()
 	return l.insertValue(v, &l.root)
 }
 
 // PushBack inserts a new element e with value v at the back of list l and returns e.
-func (l *List[T]) PushBack(v T) *Node[T] {
+func (l *LinkedList[T]) PushBack(v T) *Node[T] {
 	l.lazyInit()
 	return l.insertValue(v, l.root.prev)
 }
@@ -156,7 +156,7 @@ func (l *List[T]) PushBack(v T) *Node[T] {
 // InsertBefore inserts a new element e with value v immediately before mark and returns e.
 // If mark is not an element of l, the list is not modified.
 // The mark must not be nil.
-func (l *List[T]) InsertBefore(v T, mark *Node[T]) *Node[T] {
+func (l *LinkedList[T]) InsertBefore(v T, mark *Node[T]) *Node[T] {
 	if mark.list != l {
 		return nil
 	}
@@ -167,7 +167,7 @@ func (l *List[T]) InsertBefore(v T, mark *Node[T]) *Node[T] {
 // InsertAfter inserts a new element e with value v immediately after mark and returns e.
 // If mark is not an element of l, the list is not modified.
 // The mark must not be nil.
-func (l *List[T]) InsertAfter(v T, mark *Node[T]) *Node[T] {
+func (l *LinkedList[T]) InsertAfter(v T, mark *Node[T]) *Node[T] {
 	if mark.list != l {
 		return nil
 	}
@@ -178,7 +178,7 @@ func (l *List[T]) InsertAfter(v T, mark *Node[T]) *Node[T] {
 // MoveToFront moves element e to the front of list l.
 // If e is not an element of l, the list is not modified.
 // The element must not be nil.
-func (l *List[T]) MoveToFront(e *Node[T]) {
+func (l *LinkedList[T]) MoveToFront(e *Node[T]) {
 	if e.list != l || l.root.next == e {
 		return
 	}
@@ -189,7 +189,7 @@ func (l *List[T]) MoveToFront(e *Node[T]) {
 // MoveToBack moves element e to the back of list l.
 // If e is not an element of l, the list is not modified.
 // The element must not be nil.
-func (l *List[T]) MoveToBack(e *Node[T]) {
+func (l *LinkedList[T]) MoveToBack(e *Node[T]) {
 	if e.list != l || l.root.prev == e {
 		return
 	}
@@ -200,7 +200,7 @@ func (l *List[T]) MoveToBack(e *Node[T]) {
 // MoveBefore moves element e to its new position before mark.
 // If e or mark is not an element of l, or e == mark, the list is not modified.
 // The element and mark must not be nil.
-func (l *List[T]) MoveBefore(e, mark *Node[T]) {
+func (l *LinkedList[T]) MoveBefore(e, mark *Node[T]) {
 	if e.list != l || e == mark || mark.list != l {
 		return
 	}
@@ -210,7 +210,7 @@ func (l *List[T]) MoveBefore(e, mark *Node[T]) {
 // MoveAfter moves element e to its new position after mark.
 // If e or mark is not an element of l, or e == mark, the list is not modified.
 // The element and mark must not be nil.
-func (l *List[T]) MoveAfter(e, mark *Node[T]) {
+func (l *LinkedList[T]) MoveAfter(e, mark *Node[T]) {
 	if e.list != l || e == mark || mark.list != l {
 		return
 	}
@@ -219,7 +219,7 @@ func (l *List[T]) MoveAfter(e, mark *Node[T]) {
 
 // PushBackList inserts a copy of another list at the back of list l.
 // The lists l and other may be the same. They must not be nil.
-func (l *List[T]) PushBackList(other *List[T]) {
+func (l *LinkedList[T]) PushBackList(other *LinkedList[T]) {
 	l.lazyInit()
 	for i, e := other.Len(), other.Front(); i > 0; i, e = i-1, e.Next() {
 		l.insertValue(e.Value, l.root.prev)
@@ -228,14 +228,14 @@ func (l *List[T]) PushBackList(other *List[T]) {
 
 // PushFrontList inserts a copy of another list at the front of list l.
 // The lists l and other may be the same. They must not be nil.
-func (l *List[T]) PushFrontList(other *List[T]) {
+func (l *LinkedList[T]) PushFrontList(other *LinkedList[T]) {
 	l.lazyInit()
 	for i, e := other.Len(), other.Back(); i > 0; i, e = i-1, e.Prev() {
 		l.insertValue(e.Value, &l.root)
 	}
 }
 
-func (l *List[T]) Each(yield func(Node[T]) bool) {
+func (l *LinkedList[T]) Each(yield func(Node[T]) bool) {
 	node := l.root.Next()
 	for {
 		if node == nil {
