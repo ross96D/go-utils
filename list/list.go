@@ -3,6 +3,7 @@ package list
 import (
 	"cmp"
 	"iter"
+	"slices"
 )
 
 const minSize = 256
@@ -38,6 +39,10 @@ func (l *SortedList[T]) ensureInit() {
 	if l.values == nil {
 		l.values = make([]T, 0, minSize)
 	}
+}
+
+func (l *SortedList[T]) Search(v T) (int, bool) {
+	return slices.BinarySearch(l.values, v)
 }
 
 func (l *SortedList[T]) append(v T) {
