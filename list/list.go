@@ -8,12 +8,12 @@ import (
 
 const minSize = 256
 
-type Ordered interface {
+type Ordered[T any] interface {
 	// on x.Compare(y) 0 is x == y, less than 0 is x < y, more than 0 is x > y
-	Compare(any) int
+	Compare(*T) int
 }
 
-type ISortedList[T Ordered] struct {
+type ISortedList[T Ordered[T]] struct {
 	values []T
 }
 
@@ -45,7 +45,7 @@ func (l *ISortedList[T]) ensureInit() {
 	}
 }
 
-func (l *ISortedList[T]) Search(v T) (int, bool) {
+func (l *ISortedList[T]) Search(v *T) (int, bool) {
 	n := len(l.values)
 	i, j := 0, n
 	for i < j {
@@ -90,9 +90,9 @@ func (l *ISortedList[T]) pos(v T) int {
 	for low <= high {
 		pos = (high + low) / 2
 
-		if v.Compare(l.values[pos]) < 0 {
+		if v.Compare(&l.values[pos]) < 0 {
 			high = pos - 1
-		} else if v.Compare(l.values[pos]) > 0 {
+		} else if v.Compare(&l.values[pos]) > 0 {
 			low = pos + 1
 		} else {
 			break
@@ -101,7 +101,7 @@ func (l *ISortedList[T]) pos(v T) int {
 
 	switch pos {
 	case 0, len(l.values) - 1:
-		if v.Compare(l.values[pos]) < 0 {
+		if v.Compare(&l.values[pos]) < 0 {
 			return pos
 		} else {
 			return pos + 1

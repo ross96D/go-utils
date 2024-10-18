@@ -65,8 +65,8 @@ type TestStruct struct {
 	n int
 }
 
-func (t TestStruct) Compare(o any) int {
-	return t.n - o.(TestStruct).n
+func (t TestStruct) Compare(o *TestStruct) int {
+	return t.n - o.n
 }
 
 func TestSortedList(t *testing.T) {
@@ -86,7 +86,7 @@ func TestSortedList(t *testing.T) {
 
 		before := l.Elem(0)
 		for _, v := range l.Iter(1) {
-			require.True(t, before.Compare(*v) <= 0)
+			require.True(t, before.Compare(v) <= 0)
 		}
 		println("seed:", seed)
 	})
@@ -110,5 +110,25 @@ func TestSortedList(t *testing.T) {
 			require.LessOrEqual(t, before, v)
 		}
 		println("seed:", seed)
+	})
+
+	t.Run("search", func(t *testing.T) {
+		t.Parallel()
+
+		l := list.SortedList[int]{}
+		l.Append(2)
+		l.Append(1)
+		l.Append(5)
+		i, ok := l.Search(1)
+		assert.True(t, ok)
+		assert.Equal(t, 0, i)
+
+		ll := list.ISortedList[TestStruct]{}
+		ll.Append(TestStruct{n: -1})
+		ll.Append(TestStruct{n: 1})
+		ll.Append(TestStruct{n: 5})
+		i, ok = ll.Search(&TestStruct{n: 1})
+		assert.True(t, ok)
+		assert.Equal(t, 1, i)
 	})
 }
