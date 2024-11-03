@@ -120,6 +120,9 @@ func (l *SortedList[T]) Elem(idx uint) T {
 	return l.values[uint(idx)]
 }
 
+// This function can take up to 2 parameters. The first one is the start range (inclusive)
+// and the second one is the end range (exclusive). When no parameters the start is 0
+// and the end is the list length
 func (l *SortedList[T]) Iter(p ...uint) iter.Seq2[int, T] {
 	start := uint(0)
 	end := uint(len(l.values))
@@ -127,7 +130,7 @@ func (l *SortedList[T]) Iter(p ...uint) iter.Seq2[int, T] {
 		start = p[0]
 	}
 	if len(p) >= 2 {
-		start = p[1]
+		end = p[1]
 	}
 	return func(yield func(int, T) bool) {
 		for i := start; i < end; i++ {
